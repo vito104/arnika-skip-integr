@@ -7,6 +7,12 @@ import (
 )
 
 func getQKDService(cfg *config.Config) *services.KeyReaderService {
+	if cfg.UsesSKIP() {
+		skipAuth := repositories.NewKMSClientCertificateAuth(cfg.Certificate, cfg.PrivateKey, cfg.CACertificate)
+		skipRepo := repositories.NewSKIPRepository(cfg.KMSURL, cfg.RemoteSystemID, cfg.KMSHTTPTimeout, cfg.KMSBackoffMaxRetries, cfg.KMSBackoffBaseDelay, skipAuth)
+		var managed services.KeyReaderManaged = skipRepo
+		return services.NewKeyReaderService(&managed)
+	}
 	kmsAuth := repositories.NewKMSClientCertificateAuth(cfg.Certificate, cfg.PrivateKey, cfg.CACertificate)
 	kmsRepo := repositories.NewHTTPKMSRepository(cfg.KMSURL, cfg.KMSHTTPTimeout, cfg.KMSBackoffMaxRetries, cfg.KMSBackoffBaseDelay, kmsAuth)
 	var managed services.KeyReaderManaged = kmsRepo
