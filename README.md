@@ -419,7 +419,30 @@ Arnika must be configured via environment variables. Defaults below are the valu
 [`config/config.go`](config/config.go); variables marked ✅ have no default and Arnika refuses to
 start without them.
 
+<<<<<<< HEAD
 ## Peer identity and inter-peer channel
+=======
+| Variable                  | Description                                                                                                  | Example                                  |
+|---------------------------|--------------------------------------------------------------------------------------------------------------|------------------------------------------|
+| LISTEN_ADDRESS            | IP address and port where Arnika listens for incoming connections                                            | 127.0.0.1:9998                           |
+| SERVER_ADDRESS            | IP address and port of the remote Arnika peer to connect to                                                  | 127.0.0.1:9998                           |
+| CERTIFICATE               | File path to the TLS certificate used for secure communication                                               | /etc/ssl/certs/arnika.crt                |
+| PRIVATE_KEY               | File path to the private key corresponding to the TLS certificate                                            | /etc/ssl/private/arnika.key              |
+| KMS_PROTOCOL              | KMS protocol to use: "etsi014" (QKD) or "skip" (SKIP protocol)                                               | etsi014/skip   (default: etsi014)        |
+| REMOTE_SYSTEM_ID          | System identifier of the remote peer (required when using SKIP protocol)                                     | qkdsystem2                               |
+| CA_CERTIFICATE            | File path to the CA certificate bundle for verifying peer certificates                                       | /etc/ssl/certs/ca-bundle.crt             |
+| KMS_HTTP_TIMEOUT          | Timeout duration for HTTP requests to the KMS (ETSI014)                                                      | 10s                                      |
+| KMS_URL                   | URL endpoint of the ETSI014 QKD Key Management System                                                        | https://localhost:8080/api/v1/keys/CONSA |
+| KMS_BACKOFF_MAX_RETRIES   | Maximum number of retry attempts for failed KMS requests                                                     | 5                                        |
+| KMS_BACKOFF_BASE_DELAY    | Initial delay before retrying a failed KMS request (exponential backoff applies)                             | 100ms                                    |
+| KMS_RETRY_INTERVAL        | Time interval between retry attempts after a failed KMS key request                                          | 60s                                      |
+| INTERVAL                  | Interval between regular key requests to the KMS; should align with WireGuard rekey interval                 | 120s                                     |
+| WIREGUARD_INTERFACE       | Name of the WireGuard network interface to configure                                                         | qcicat0                                  |
+| WIREGUARD_PEER_PUBLIC_KEY | Public key of the WireGuard peer for secure association                                                      | 8978940b-fb48-4ebf-ad7d-ca36a987fc32     |
+| PQC_PSK_FILE              | File path containing the PQC-generated preshared key                              | /tmpfs/pqc.psk                       |
+| MODE                      | Operation mode: "QkdAndPqcRequired", "AtLeastQkdRequired", "AtLeastPqcRequired", or "EitherQkdOrPqcRequired" | AtLeastQkdRequired                       |
+| ARNIKA_ID                 | Optional identifier (up to 5 digits); defaults to LISTEN_PORT; used for logging and identification           | 9998                                     |
+>>>>>>> 747d655 (Update README.md)
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
