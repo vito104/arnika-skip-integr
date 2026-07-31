@@ -14,4 +14,3 @@ ci/node-b/nodse-a.pub
 tools/kms
 tools/mock
 /security
-go.mod
