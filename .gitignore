@@ -10,7 +10,8 @@ ci/node-a/node-b.pub
 ci/node-b/node-b-pqc.key
 ci/node-b/node-b.key
 ci/node-b/node-b.pub
-ci/node-b/node-a.pub
+ci/node-b/nodse-a.pub
 tools/kms
 tools/mock
 /security
+go.mod
