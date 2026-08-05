@@ -68,7 +68,7 @@ _Figure 3_ shows the key path of 2 interconnected sites for the hyprid mode (C) 
   </tr>
 </table>
 
-The QKD key is obtained via ETSI014 from the QKDs embedded KMS and the PQC key is obtained via API or pointer/filedescriptor from any alternative PQC function/implementation.
+The QKD key is obtained via ETSI014 or SKIP from the QKDs embedded KMS and the PQC key is obtained via API or pointer/filedescriptor from any alternative PQC function/implementation.
 
 
 Subsequently, the **KEY-CONTROL function** uses the **QKD key** and **PQC key** by using a **HKDF HMAC Key Derivation Function** with SHA3-256 as the hash function, to derive a single key from the two input keys (QKD, PQC).
@@ -326,8 +326,8 @@ Arnika must be configured via environment variables, following are available:
 | KMS_PROTOCOL              | KMS protocol to use: "etsi014" (QKD) or "skip" (SKIP protocol)                                               | etsi014/skip   (default: etsi014)        |
 | REMOTE_SYSTEM_ID          | System identifier of the remote peer (required when using SKIP protocol)                                     | qkdsystem2                               |
 | CA_CERTIFICATE            | File path to the CA certificate bundle for verifying peer certificates                                       | /etc/ssl/certs/ca-bundle.crt             |
-| KMS_HTTP_TIMEOUT          | Timeout duration for HTTP requests to the KMS (ETSI014)                                                      | 10s                                      |
-| KMS_URL                   | URL endpoint of the ETSI014 QKD Key Management System                                                        | https://localhost:8080/api/v1/keys/CONSA |
+| KMS_HTTP_TIMEOUT          | Timeout duration for HTTP requests to the KMS (ETSI014/SKIP)                                                 | 10s                                      |
+| KMS_URL                   | URL endpoint of the ETSI014 or SKIP QKD Key Management System                                                | https://localhost:8080/api/v1/keys/CONSA (ETSI014) / https://localhost:8200/  (SKIP)|
 | KMS_BACKOFF_MAX_RETRIES   | Maximum number of retry attempts for failed KMS requests                                                     | 5                                        |
 | KMS_BACKOFF_BASE_DELAY    | Initial delay before retrying a failed KMS request (exponential backoff applies)                             | 100ms                                    |
 | KMS_RETRY_INTERVAL        | Time interval between retry attempts after a failed KMS key request                                          | 60s                                      |
