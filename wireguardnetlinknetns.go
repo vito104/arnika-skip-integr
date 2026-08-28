@@ -1,4 +1,4 @@
-//go:build !wireguard_netlink_netns && !wireguard_mikrotik
+//go:build wireguard_netlink_netns
 
 package main
 
@@ -9,10 +9,9 @@ import (
 )
 
 func getKeyWriterService(cfg *config.Config) (*services.KeyWriterService, error) {
-	wireguardRepo, err := repositories.NewWireguardNetlinkRepository(cfg.WireGuardInterface, cfg.WireguardPeerPublicKey)
+	wireguardRepo, err := repositories.NewWireguardNetlinkNetnsRepository(cfg.WireGuardInterface, cfg.WireguardPeerPublicKey, cfg.WireGuardNetnsPath)
 	if err != nil {
 		return nil, err
-
 	}
 	return services.NewKeyWriterService(wireguardRepo), nil
 }
