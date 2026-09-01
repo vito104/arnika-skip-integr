@@ -30,7 +30,6 @@ type Config struct {
 	Interval               time.Duration // INTERVAL, Interval between key updates
 	WireGuardInterface     string        // WIREGUARD_INTERFACE, Name of the WireGuard interface to configure
 	WireguardPeerPublicKey string        // WIREGUARD_PEER_PUBLIC_KEY, Public key of the WireGuard peer
-	WireGuardNetnsPath     string        // WIREGUARD_NETNS_PATH, Path to network namespace (optional)
 	PQCPSKFile             string        // PQC_PSK_FILE, Path to the PQC PSK file
 	Mode                   string        // MODE, Operation mode ("QkdAndPqcRequired", "AtLeastQkdRequired", "AtLeastPqcRequired", "EitherQkdOrPqcRequired")
 	RateLimit              int           // RATE_LIMIT, Max requests per IP per window
@@ -110,11 +109,6 @@ func (c *Config) PrintStartupConfig() {
 
 	fmt.Printf("WireGuard Interface:      %s\n", c.WireGuardInterface)
 	fmt.Printf("WireGuard Peer PublicKey: %s\n", c.WireguardPeerPublicKey)
-	if c.WireGuardNetnsPath != "" {
-		fmt.Printf("WireGuard Netns Path:     %s\n", c.WireGuardNetnsPath)
-	} else {
-		fmt.Println("WireGuard Netns Path:     (not configured)")
-	}
 	fmt.Printf("Rate Limit:               %d\n", c.RateLimit)
 	fmt.Printf("Rate Window:              %s\n", c.RateWindow)
 	fmt.Printf("Max Clock Skew:           %s\n", c.MaxClockSkew)
@@ -180,7 +174,6 @@ func Parse() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	config.WireGuardNetnsPath = getEnvOrDefault("WIREGUARD_NETNS_PATH", "")
 	config.PQCPSKFile = getEnvOrDefault("PQC_PSK_FILE", "")
 	if config.PQCPSKFile != "" {
 		fileInfo, err := os.Stat(config.PQCPSKFile)
