@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/containernetworking/plugins/pkg/ns"
@@ -32,12 +33,16 @@ func (r *WireguardNetlinkNetnsRepository) InvalidateTunnel() error {
 	return r.SetPSK(psk.String())
 }
 
-func (r *WireguardNetlinkNetnsRepository) SetPSK(psk string) error {
+func (r *WireguardNetlinkNetnsRepository) SetPSK(psk string) (err error) {
 	targetNS, err := ns.GetNS(r.netnsPath)
 	if err != nil {
 		return fmt.Errorf("failed to open network namespace %s: %w", r.netnsPath, err)
 	}
-	defer targetNS.Close()
+	defer func() {
+		if closeErr := targetNS.Close(); closeErr != nil {
+			err = errors.Join(err, fmt.Errorf("failed to close network namespace %s: %w", r.netnsPath, closeErr))
+		}
+	}()
 
 	return targetNS.Do(func(_ ns.NetNS) error {
 		delegateRepo, err := NewWireguardNetlinkRepository(r.ifaceName, r.peerPublicKey)
