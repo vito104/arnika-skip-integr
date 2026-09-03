@@ -1,3 +1,7 @@
+//go:build linux
+
+// containernetworking/plugins/pkg/ns is Linux-only, hence we restrict the build.
+
 package repositories
 
 import (
