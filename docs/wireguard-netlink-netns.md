@@ -65,6 +65,12 @@ Arnika must start after the interface and namespace exist. Requires `CAP_NET_ADM
 
 ---
 
+## Security Considerations
+
+### Namespace path permissions
+
+`WIREGUARD_NETNS_PATH` is trusted without further verification. Thus if an attacker controls the namespace at that path, Arnika will happily inject the PSK into their interface instead of the intended one. Ensure the namespace file and its parent directory are owned by the service account running Arnika with restrictive permissions (e.g. `0700`), and avoid symlinks that could be repointed by an untrusted process.
+
 ## References
 
 - Module architecture: [`KEYCONTROL.md`](../KEYCONTROL.md)
