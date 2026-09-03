@@ -40,4 +40,5 @@ KMS_URL="http://192.168.101.1:8080/api/v1/keys/CONSB" \
 WIREGUARD_INTERFACE=wg0 \
 WIREGUARD_PEER_PUBLIC_KEY="$(cat /etc/arnika/node-a.pub)" \
 WIREGUARD_NETNS_PATH="$NETNS_PATH" \
+ARNIKA_PSK="mJNYzLNLRCl9jRRkP/Qsa74v4bem4BC+KbqQz+Ft9lQ=" \
 arnika &>> /tmp/arnika-ns-b.log &
