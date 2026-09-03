@@ -51,9 +51,9 @@ func (r *WireguardNetlinkNetnsRepository) SetPSK(psk string) (err error) {
 	return targetNS.Do(func(_ ns.NetNS) error {
 		delegateRepo, err := NewWireguardNetlinkRepository(r.ifaceName, r.peerPublicKey)
 		if err != nil {
-			return errors.New("failed to create WireguardNetlinkRepository")
+			return fmt.Errorf("failed to create netlink repository in namespace %s: %w", r.netnsPath, err)
 		}
-
+		defer func() { _ = delegateRepo.Close() }()
 		return delegateRepo.SetPSK(psk)
 	})
 }
