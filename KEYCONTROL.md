@@ -106,8 +106,8 @@ signal.
 | `kms` | Reader (managed) | [`repositories/kms.go`](repositories/kms.go) | _(always compiled)_ | any | _pending_ — see [`KMS.md`](KMS.md) |
 | `pqc` | Reader (unmanaged) | [`repositories/pqc.go`](repositories/pqc.go) | _(always compiled)_ | any | _pending_ |
 | `wireguard-netlink` | Writer | [`repositories/wireguard-netlink.go`](repositories/wireguard-netlink.go) | _(default)_ / `wireguard_netlink` | linux _(compiles elsewhere, no device)_ | [`docs/wireguard-netlink.md`](docs/wireguard-netlink.md) |
+| `wireguard-netlink-netns` | Writer | [`repositories/wireguard-netlink-netns.go`](repositories/wireguard-netlink-netns.go) | `wireguard_netlink_netns` | linux | [`docs/wireguard-netlink-netns.md`](docs/wireguard-netlink-netns.md) |
 | `wireguard-mikrotik` | Writer | [`repositories/wireguard-mikrotik.go`](repositories/wireguard-mikrotik.go) | `wireguard_mikrotik` | any | [`docs/wireguard-mikrotik.md`](docs/wireguard-mikrotik.md) |
-
 ---
 
 ## Code Map

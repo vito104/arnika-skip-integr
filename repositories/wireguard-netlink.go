@@ -70,3 +70,7 @@ func (r *WireguardNetlinkRepository) SetPSK(psk string) error {
 	}
 	return r.conn.ConfigureDevice(r.InterfaceName, wgtypes.Config{Peers: []wgtypes.PeerConfig{peer}})
 }
+
+func (r *WireguardNetlinkRepository) Close() error {
+	return r.conn.Close()
+}

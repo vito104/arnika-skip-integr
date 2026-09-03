@@ -1,0 +1,24 @@
+# Dockerfile for Arnika test nodes with network namespace support
+FROM golang:1.26-alpine AS builder
+
+WORKDIR /build
+COPY . .
+
+ENV CGO_ENABLED=0
+ENV GOEXPERIMENT=runtimesecret
+
+RUN go build -tags wireguard_netlink_netns -o /arnika .
+
+FROM alpine:latest
+
+RUN apk add --no-cache \
+  bash \
+  wireguard-tools \
+  iproute2 \
+  iputils \
+  curl \
+  jq
+
+COPY --from=builder /arnika /usr/local/bin/arnika
+
+CMD ["sleep", "infinity"]
