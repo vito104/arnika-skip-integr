@@ -16,7 +16,7 @@ type WireguardNetlinkNetnsRepository struct {
 
 func NewWireguardNetlinkNetnsRepository(interfaceName, peerPublicKey, netnsPath string) (*WireguardNetlinkNetnsRepository, error) {
 	if netnsPath == "" {
-		return nil, fmt.Errorf("netns path cannot be empty")
+		return nil, errors.New("WIREGUARD_NETNS_PATH must be set")
 	}
 	return &WireguardNetlinkNetnsRepository{
 		ifaceName:     interfaceName,
@@ -47,7 +47,7 @@ func (r *WireguardNetlinkNetnsRepository) SetPSK(psk string) (err error) {
 	return targetNS.Do(func(_ ns.NetNS) error {
 		delegateRepo, err := NewWireguardNetlinkRepository(r.ifaceName, r.peerPublicKey)
 		if err != nil {
-			return fmt.Errorf("failed to create WireguardNetlinkRepository")
+			return errors.New("failed to create WireguardNetlinkRepository")
 		}
 
 		return delegateRepo.SetPSK(psk)
