@@ -14,11 +14,13 @@ This is the single document for the `wireguard-netlink-netns` module. For the ge
 | **Kind** | Key writer (sink) |
 | **Build tag** | `wireguard_netlink_netns` |
 | **Adapter** | [`repositories/wireguard-netlink-netns.go`](../repositories/wireguard-netlink-netns.go) |
+| **Tests** | _no unit tests_, only integration tests in `ci/namespaces` ran by the CI |
 | **Wiring** | [`wireguardnetlinknetns.go`](../wireguardnetlinknetns.go) |
 | **Target** | A **local** WireGuard interface in a network namespace |
 | **Transport** | `wgctrl` over netlink inside the namespace |
 | **Dependencies** | `golang.zx2c4.com/wireguard/wgctrl`, `github.com/containernetworking/plugins/pkg/ns` |
 | **Privileges** | `CAP_NET_ADMIN`, `CAP_SYS_ADMIN` — it reconfigures a network device inside a namespace |
+| **Platform** | Linux only
 
 ---
 
