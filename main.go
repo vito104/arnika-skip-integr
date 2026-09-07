@@ -15,7 +15,6 @@ import (
 	"github.com/arnika-project/arnika/kdf"
 	"github.com/arnika-project/arnika/services"
 )
-//test
 var (
 	// allows to set version on build.
 	Version string
