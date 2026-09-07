@@ -82,7 +82,7 @@ _Figure 3_ shows the key path of 2 interconnected sites for the hyprid mode (C) 
   </tr>
 </table>
 
-The QKD key is obtained via ETSI014 or SKIP from the QKDs embedded KMS and the PQC key is obtained via API or pointer/filedescriptor from any alternative PQC function/implementation.
+The QKD key is obtained via ETSI014 from the QKDs embedded KMS and the PQC key is obtained via API or pointer/filedescriptor from any alternative PQC function/implementation.
 
 
 Subsequently, the **KEY-CONTROL function** uses the **QKD key** and **PQC key** by using a **HKDF HMAC Key Derivation Function** with SHA3-256 as the hash function, to derive a single key from the two input keys (QKD, PQC).
@@ -420,6 +420,7 @@ Arnika must be configured via environment variables. Defaults below are the valu
 start without them.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Peer identity and inter-peer channel
 =======
 | Variable                  | Description                                                                                                  | Example                                  |
@@ -443,6 +444,9 @@ start without them.
 | MODE                      | Operation mode: "QkdAndPqcRequired", "AtLeastQkdRequired", "AtLeastPqcRequired", or "EitherQkdOrPqcRequired" | AtLeastQkdRequired                       |
 | ARNIKA_ID                 | Optional identifier (up to 5 digits); defaults to LISTEN_PORT; used for logging and identification           | 9998                                     |
 >>>>>>> 747d655 (Update README.md)
+=======
+## Peer identity and inter-peer channel
+>>>>>>> 075812f (new readme)
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
