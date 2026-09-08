@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -36,7 +37,7 @@ type Config struct {
 	RateLimit              int           // RATE_LIMIT, Max requests per IP per window
 	RateWindow             time.Duration // RATE_WINDOW, Window duration for rate limiting
 	MaxClockSkew           time.Duration // MAX_CLOCK_SKEW, allowed timestamp difference as duration (replay protection)
-	RemoteSystemID         string        // REMOTE_SYSTEM_ID, system ID of peer
+	RemoteSystemID         string        // SKIP_REMOTE_SYSTEM_ID, system ID of peer
 }
 
 // UsePQC returns a boolean indicating whether the PQC PSK file is set in the Config struct.
@@ -158,8 +159,8 @@ func Parse() (*Config, error) {
 		}
 		config.ArnikaID = port
 	}
-	config.KMSProtocol = getEnvOrDefault("KMS_PROTOCOL", "etsi014")
-	if config.KMSProtocol != "etsi014" && config.KMSProtocol != "skip" {
+	config.KMSProtocol = strings.ToLower(getEnvOrDefault("KMS_PROTOCOL", ""))
+	if config.KMSProtocol != "" && config.KMSProtocol != "etsi014" && config.KMSProtocol != "skip" {
 		return nil, fmt.Errorf("[ERROR] invalid KMS_PROTOCOL: %s (must be 'etsi014' or 'skip')", config.KMSProtocol)
 	}
 	config.Certificate = getEnvOrDefault("CERTIFICATE", "")
@@ -243,7 +244,7 @@ func Parse() (*Config, error) {
 		return nil, fmt.Errorf("[ERROR] failed to parse MAX_CLOCK_SKEW: %w", err)
 	}
 	config.MaxClockSkew = maxClockSkew
-	config.RemoteSystemID = getEnvOrDefault("REMOTE_SYSTEM_ID", "")
+	config.RemoteSystemID = getEnvOrDefault("SKIP_REMOTE_SYSTEM_ID", "")
 	if config.UsesSKIP() && config.RemoteSystemID == "" {
 		return nil, fmt.Errorf("[ERROR] Remote system ID is required when selected protocol is SKIP")
 	}
@@ -291,5 +292,5 @@ func (c *Config) UsesSKIP() bool {
 }
 
 func (c *Config) UsesETSI014() bool {
-	return c.KMSProtocol == "etsi014"
+	return c.KMSProtocol == "etsi014" || c.KMSProtocol == ""
 }

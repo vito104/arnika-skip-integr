@@ -430,7 +430,7 @@ start without them.
 | CERTIFICATE               | File path to the TLS certificate used for secure communication                                               | /etc/ssl/certs/arnika.crt                |
 | PRIVATE_KEY               | File path to the private key corresponding to the TLS certificate                                            | /etc/ssl/private/arnika.key              |
 | KMS_PROTOCOL              | KMS protocol to use: "etsi014" (QKD) or "skip" (SKIP protocol)                                               | etsi014/skip   (default: etsi014)        |
-| REMOTE_SYSTEM_ID          | System identifier of the remote peer (required when using SKIP protocol)                                     | qkdsystem2                               |
+| SKIP_REMOTE_SYSTEM_ID          | System identifier of the remote peer (required when using SKIP protocol)                                     | qkdsystem2                               |
 | CA_CERTIFICATE            | File path to the CA certificate bundle for verifying peer certificates                                       | /etc/ssl/certs/ca-bundle.crt             |
 | KMS_HTTP_TIMEOUT          | Timeout duration for HTTP requests to the KMS (ETSI014/SKIP)                                                 | 10s                                      |
 | KMS_URL                   | URL endpoint of the ETSI014 or SKIP QKD Key Management System                                                | https://localhost:8080/api/v1/keys/CONSA (ETSI014) / https://localhost:8200/  (SKIP)|
@@ -480,6 +480,8 @@ start without them.
 | `CERTIFICATE` | ➖* | _(none)_ | Client certificate presented to the **KMS** |
 | `PRIVATE_KEY` | ➖* | _(none)_ | Private key for `CERTIFICATE` |
 | `CA_CERTIFICATE` | ➖* | _(none)_ | CA bundle used to verify the **KMS** certificate |
+| `KMS_PROTOCOL` | ➖ | `etsi014` | Protocol to use for KMS (`etsi014` or `skip`) |
+| `SKIP_REMOTE_SYSTEM_ID` | ➖ | `""` | System ID of the peer (required when using SKIP protocol) |
 
 > [!NOTE]
 > \* These three are **all-or-nothing**: client-certificate authentication is enabled only when
