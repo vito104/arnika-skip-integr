@@ -66,7 +66,7 @@ func NewSKIPRepository(url string, remoteSystemID string, timeout time.Duration,
 	}
 }
 
-// This is main fuction to proceed skip request
+// This is main function to proceed skip request
 func (r *SKIPRepository) skipRequest(requestURL string) (string, []byte, error) {
 	var res *http.Response
 	var err error
@@ -130,7 +130,7 @@ func (r *SKIPRepository) skipRequest(requestURL string) (string, []byte, error) 
 	}
 
 	if skipResp.KeyID == "" || skipResp.Key == "" {
-		return "", nil, fmt.Errorf("[ERROR] received empty key or KeyID from server")
+		return "", nil, fmt.Errorf("[ERROR] received empty key or keyID from server")
 	}
 
 	var rawKey []byte
@@ -153,29 +153,29 @@ func (r *SKIPRepository) skipRequest(requestURL string) (string, []byte, error) 
 
 func (r *SKIPRepository) GetNewKey() (string, []byte, error) {
 	requestURL := r.baseURL + "/key?remoteSystemID=" + r.remoteSystemID
-	KeyID, key, err := r.skipRequest(requestURL)
+	keyID, key, err := r.skipRequest(requestURL)
 
 	if err != nil {
 		return "", nil, fmt.Errorf("[ERROR] failed to get new key: %w", err)
 	}
 
-	return KeyID, key, nil
+	return keyID, key, nil
 }
 
-func (r *SKIPRepository) GetKeyByID(KeyID *string) ([]byte, error) {
-	if KeyID == nil || *KeyID == "" {
-		return nil, fmt.Errorf("[ERROR] KeyID is nil or empty")
+func (r *SKIPRepository) GetKeyByID(keyID *string) ([]byte, error) {
+	if keyID == nil || *keyID == "" {
+		return nil, fmt.Errorf("[ERROR] keyID is nil or empty")
 	}
 
-	if len(*KeyID) > 128 {
-		return nil, fmt.Errorf("[ERROR] KeyID is too long")
+	if len(*keyID) > 128 {
+		return nil, fmt.Errorf("[ERROR] keyID is too long")
 	}
 
-	if _, err := hex.DecodeString(*KeyID); err != nil {
-		return nil, fmt.Errorf("[ERROR] KeyID is not a valid hex string")
+	if _, err := hex.DecodeString(*keyID); err != nil {
+		return nil, fmt.Errorf("[ERROR] keyID is not a valid hex string")
 	}
 
-	escapedKeyID := url.PathEscape(*KeyID)
+	escapedKeyID := url.PathEscape(*keyID)
 
 	requestURL := r.baseURL + "/key/" + escapedKeyID + "?remoteSystemID=" + r.remoteSystemID
 	_, key, err := r.skipRequest(requestURL)

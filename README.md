@@ -419,34 +419,7 @@ Arnika must be configured via environment variables. Defaults below are the valu
 [`config/config.go`](config/config.go); variables marked ✅ have no default and Arnika refuses to
 start without them.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ## Peer identity and inter-peer channel
-=======
-| Variable                  | Description                                                                                                  | Example                                  |
-|---------------------------|--------------------------------------------------------------------------------------------------------------|------------------------------------------|
-| LISTEN_ADDRESS            | IP address and port where Arnika listens for incoming connections                                            | 127.0.0.1:9998                           |
-| SERVER_ADDRESS            | IP address and port of the remote Arnika peer to connect to                                                  | 127.0.0.1:9998                           |
-| CERTIFICATE               | File path to the TLS certificate used for secure communication                                               | /etc/ssl/certs/arnika.crt                |
-| PRIVATE_KEY               | File path to the private key corresponding to the TLS certificate                                            | /etc/ssl/private/arnika.key              |
-| KMS_PROTOCOL              | KMS protocol to use: "etsi014" (QKD) or "skip" (SKIP protocol)                                               | etsi014/skip   (default: etsi014)        |
-| SKIP_REMOTE_SYSTEM_ID          | System identifier of the remote peer (required when using SKIP protocol)                                     | qkdsystem2                               |
-| CA_CERTIFICATE            | File path to the CA certificate bundle for verifying peer certificates                                       | /etc/ssl/certs/ca-bundle.crt             |
-| KMS_HTTP_TIMEOUT          | Timeout duration for HTTP requests to the KMS (ETSI014/SKIP)                                                 | 10s                                      |
-| KMS_URL                   | URL endpoint of the ETSI014 or SKIP QKD Key Management System                                                | https://localhost:8080/api/v1/keys/CONSA (ETSI014) / https://localhost:8200/  (SKIP)|
-| KMS_BACKOFF_MAX_RETRIES   | Maximum number of retry attempts for failed KMS requests                                                     | 5                                        |
-| KMS_BACKOFF_BASE_DELAY    | Initial delay before retrying a failed KMS request (exponential backoff applies)                             | 100ms                                    |
-| KMS_RETRY_INTERVAL        | Time interval between retry attempts after a failed KMS key request                                          | 60s                                      |
-| INTERVAL                  | Interval between regular key requests to the KMS; should align with WireGuard rekey interval                 | 120s                                     |
-| WIREGUARD_INTERFACE       | Name of the WireGuard network interface to configure                                                         | qcicat0                                  |
-| WIREGUARD_PEER_PUBLIC_KEY | Public key of the WireGuard peer for secure association                                                      | 8978940b-fb48-4ebf-ad7d-ca36a987fc32     |
-| PQC_PSK_FILE              | File path containing the PQC-generated preshared key                              | /tmpfs/pqc.psk                       |
-| MODE                      | Operation mode: "QkdAndPqcRequired", "AtLeastQkdRequired", "AtLeastPqcRequired", or "EitherQkdOrPqcRequired" | AtLeastQkdRequired                       |
-| ARNIKA_ID                 | Optional identifier (up to 5 digits); defaults to LISTEN_PORT; used for logging and identification           | 9998                                     |
->>>>>>> 747d655 (Update README.md)
-=======
-## Peer identity and inter-peer channel
->>>>>>> 075812f (new readme)
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
@@ -468,23 +441,25 @@ start without them.
 >
 > Note that the startup banner prints this value in cleartext.
 
-## Key reader — QKD / KMS (ETSI GS QKD 014)
+## Key reader — QKD / KMS (ETSI GS QKD 014 and SKIP)
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `KMS_URL` | ✅ | — | KMS endpoint for this peer's SAE, e.g. `https://kms.example:8443/api/v1/keys/CONSA` |
+| `KMS_URL` | ✅ | — | KMS endpoint for this peer's SAE, e.g. `https://kms.example:8443/api/v1/keys/CONSA` (ETSI014) or `https://kp.example:8200` (SKIP) |
 | `KMS_HTTP_TIMEOUT` | ➖ | `10s` | HTTP timeout for KMS requests |
 | `KMS_BACKOFF_MAX_RETRIES` | ➖ | `5` | Retry attempts per failed KMS request |
 | `KMS_BACKOFF_BASE_DELAY` | ➖ | `100ms` | First backoff delay; grows exponentially per retry |
 | `KMS_RETRY_INTERVAL` | ➖ | `INTERVAL / 2` | Wait before the next rotation attempt after all retries failed |
-| `CERTIFICATE` | ➖* | _(none)_ | Client certificate presented to the **KMS** |
-| `PRIVATE_KEY` | ➖* | _(none)_ | Private key for `CERTIFICATE` |
-| `CA_CERTIFICATE` | ➖* | _(none)_ | CA bundle used to verify the **KMS** certificate |
-| `KMS_PROTOCOL` | ➖ | `etsi014` | Protocol to use for KMS (`etsi014` or `skip`) |
-| `SKIP_REMOTE_SYSTEM_ID` | ➖ | `""` | System ID of the peer (required when using SKIP protocol) |
+| `KMS_PROTOCOL` | ➖ | `etsi014` | Protocol to use for KMS: `etsi014` (ETSI GS QKD 014) or `skip` (SKIP protocol) |
+| `SKIP_REMOTE_SYSTEM_ID` | ⚠️* | `""` | SKIP-only: System ID of the peer's KP identifier (required when `KMS_PROTOCOL=skip`) |
+| `CERTIFICATE` | ➖** | _(none)_ | Client certificate presented to the **KMS** |
+| `PRIVATE_KEY` | ➖** | _(none)_ | Private key for `CERTIFICATE` |
+| `CA_CERTIFICATE` | ➖** | _(none)_ | CA bundle used to verify the **KMS** certificate |
 
 > [!NOTE]
-> \* These three are **all-or-nothing**: client-certificate authentication is enabled only when
+> \* `SKIP_REMOTE_SYSTEM_ID` is **required when `KMS_PROTOCOL=skip`**, optional otherwise.
+>
+> \*\* These three are **all-or-nothing**: client-certificate authentication is enabled only when
 > all three are set. If any one of them is empty, all three are ignored, and the KMS connection
 > falls back to a plain HTTPS client that validates the server against the system root store
 > (TLS 1.2 minimum). When all three are set, `CA_CERTIFICATE` *replaces* the system roots, so the

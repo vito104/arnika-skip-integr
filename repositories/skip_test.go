@@ -64,10 +64,10 @@ func TestSKIPRepository_GetNewKey_Success(t *testing.T) {
 func TestSKIPRepository_GetKeyByID_Success(t *testing.T) {
 	validKeyBytes := make([]byte, 32)
 	validKeyHex := hex.EncodeToString(validKeyBytes)
-	validKeyIDHex := "0102030405060708"
+	validkeyIDHex := "0102030405060708"
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		expectedPath := "/key/" + validKeyIDHex
+		expectedPath := "/key/" + validkeyIDHex
 		if r.URL.Path != expectedPath {
 			http.Error(w, "not found path: "+r.URL.Path, http.StatusNotFound)
 			return
@@ -78,13 +78,13 @@ func TestSKIPRepository_GetKeyByID_Success(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(skipResponse{
-			KeyID: validKeyIDHex,
+			KeyID: validkeyIDHex,
 			Key:   validKeyHex,
 		})
 	}))
 	defer srv.Close()
 
-	keyIDPtr := &validKeyIDHex
+	keyIDPtr := &validkeyIDHex
 	keyBytes, err := newSKIPTestRepo(srv.URL, 0).GetKeyByID(keyIDPtr)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -144,30 +144,30 @@ func TestSKIPRepository_MalformedOrShortKey(t *testing.T) {
 	})
 }
 
-// TestSKIPRepository_KeyIDValidation checks that empty, nil, or invalid hex KeyIDs are rejected early.
-func TestSKIPRepository_KeyIDValidation(t *testing.T) {
+// TestSKIPRepository_keyIDValidation checks that empty, nil, or invalid hex keyIDs are rejected early.
+func TestSKIPRepository_keyIDValidation(t *testing.T) {
 	repo := newSKIPTestRepo("http://localhost", 0)
 
-	t.Run("NilKeyID", func(t *testing.T) {
+	t.Run("NilkeyID", func(t *testing.T) {
 		_, err := repo.GetKeyByID(nil)
 		if err == nil {
-			t.Fatal("expected error for nil KeyID, got nil")
+			t.Fatal("expected error for nil keyID, got nil")
 		}
 	})
 
-	t.Run("EmptyKeyID", func(t *testing.T) {
+	t.Run("EmptykeyID", func(t *testing.T) {
 		emptyID := ""
 		_, err := repo.GetKeyByID(&emptyID)
 		if err == nil {
-			t.Fatal("expected error for empty KeyID, got nil")
+			t.Fatal("expected error for empty keyID, got nil")
 		}
 	})
 
-	t.Run("InvalidHexKeyID", func(t *testing.T) {
+	t.Run("InvalidHexkeyID", func(t *testing.T) {
 		invalidID := "not-hex-!!spec"
 		_, err := repo.GetKeyByID(&invalidID)
 		if err == nil {
-			t.Fatal("expected error for non-hex KeyID, got nil")
+			t.Fatal("expected error for non-hex keyID, got nil")
 		}
 	})
 }

@@ -37,7 +37,7 @@ type Config struct {
 	RateLimit              int           // RATE_LIMIT, Max requests per IP per window
 	RateWindow             time.Duration // RATE_WINDOW, Window duration for rate limiting
 	MaxClockSkew           time.Duration // MAX_CLOCK_SKEW, allowed timestamp difference as duration (replay protection)
-	RemoteSystemID         string        // SKIP_REMOTE_SYSTEM_ID, system ID of peer
+	SKIPRemoteSystemID     string        // SKIP_REMOTE_SYSTEM_ID, system ID of peer
 }
 
 // UsePQC returns a boolean indicating whether the PQC PSK file is set in the Config struct.
@@ -117,7 +117,7 @@ func (c *Config) PrintStartupConfig() {
 	fmt.Printf("Max Clock Skew:           %s\n", c.MaxClockSkew)
 	if c.UsesSKIP() {
 		fmt.Print("KMS Protocol:            SKIP\n")
-		fmt.Printf("Remote System ID:         %s\n", c.RemoteSystemID)
+		fmt.Printf("Remote System ID:         %s\n", c.SKIPRemoteSystemID)
 	} else {
 		fmt.Printf("KMS Protocol:        ETSI014\n")
 	}
@@ -244,8 +244,8 @@ func Parse() (*Config, error) {
 		return nil, fmt.Errorf("[ERROR] failed to parse MAX_CLOCK_SKEW: %w", err)
 	}
 	config.MaxClockSkew = maxClockSkew
-	config.RemoteSystemID = getEnvOrDefault("SKIP_REMOTE_SYSTEM_ID", "")
-	if config.UsesSKIP() && config.RemoteSystemID == "" {
+	config.SKIPRemoteSystemID = getEnvOrDefault("SKIP_REMOTE_SYSTEM_ID", "")
+	if config.UsesSKIP() && config.SKIPRemoteSystemID == "" {
 		return nil, fmt.Errorf("[ERROR] Remote system ID is required when selected protocol is SKIP")
 	}
 	return config, nil

@@ -8,7 +8,7 @@ import (
 
 func getSKIPService(cfg *config.Config) *services.KeyReaderService {
 	skipAuth := repositories.NewKMSClientCertificateAuth(cfg.Certificate, cfg.PrivateKey, cfg.CACertificate)
-	skipRepo := repositories.NewSKIPRepository(cfg.KMSURL, cfg.RemoteSystemID, cfg.KMSHTTPTimeout, cfg.KMSBackoffMaxRetries, cfg.KMSBackoffBaseDelay, skipAuth)
+	skipRepo := repositories.NewSKIPRepository(cfg.KMSURL, cfg.SKIPRemoteSystemID, cfg.KMSHTTPTimeout, cfg.KMSBackoffMaxRetries, cfg.KMSBackoffBaseDelay, skipAuth)
 	var managed services.KeyReaderManaged = skipRepo
 	return services.NewKeyReaderService(&managed)
 }
