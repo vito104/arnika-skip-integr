@@ -9,24 +9,21 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"runtime/secret"
+	"strings"
 	"time"
 )
 
-type skipKey struct {
-	KeyID string `json:"keyId"`
-	Key   string `json:"key"`
-}
-
 type skipResponse struct {
-	KeyID string `json:"keyId"`
+	KeyID string `json:"keyID"`
 	Key   string `json:"key"`
 }
 
 type SKIPRepository struct {
 	baseURL          string
-	remoteSystemId   string
+	remoteSystemID   string
 	maxRetries       int
 	backoffBaseDelay time.Duration
 	conn             *http.Client
@@ -34,6 +31,8 @@ type SKIPRepository struct {
 }
 
 func NewSKIPRepository(url string, remoteSystemID string, timeout time.Duration, maxRetries int, backoffBaseDelay time.Duration, auth *KMSAuth) *SKIPRepository {
+	cleanBaseURL := strings.TrimSuffix(url, "/")
+
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
@@ -55,8 +54,8 @@ func NewSKIPRepository(url string, remoteSystemID string, timeout time.Duration,
 		tr.TLSClientConfig.RootCAs = caCertPool //use this pool for server auth
 	}
 	return &SKIPRepository{
-		baseURL:          url,
-		remoteSystemId:   remoteSystemID,
+		baseURL:          cleanBaseURL,
+		remoteSystemID:   remoteSystemID,
 		maxRetries:       maxRetries,
 		backoffBaseDelay: backoffBaseDelay,
 		conn: &http.Client{
@@ -67,21 +66,58 @@ func NewSKIPRepository(url string, remoteSystemID string, timeout time.Duration,
 	}
 }
 
-// This is main fuction to proceed skip request
-func (r *SKIPRepository) skipRequest(requestUrl string) (string, []byte, error) {
-	res, err := r.conn.Get(requestUrl)
+// This is main function to proceed skip request
+func (r *SKIPRepository) skipRequest(requestURL string) (string, []byte, error) {
+	var res *http.Response
+	var err error
 
-	if err != nil {
-		return "", nil, err
+	retries := r.maxRetries
+	if retries < 0 {
+		retries = 0
 	}
 
-	defer res.Body.Close()
+	delay := r.backoffBaseDelay
+	if delay <= 0 {
+		delay = 100 * time.Millisecond
+	}
+
+	for attempt := 0; attempt <= retries; attempt++ {
+		res, err = r.conn.Get(requestURL)
+		if err == nil {
+			if res.StatusCode == http.StatusBadRequest {
+				break
+			}
+			if res.StatusCode >= 500 {
+				_ = res.Body.Close()
+				time.Sleep(delay)
+				delay *= 2
+				continue
+			}
+			break
+		}
+
+		if attempt == retries {
+			return "", nil, err
+		}
+		time.Sleep(delay)
+		delay *= 2
+	}
+
+	if res == nil {
+		return "", nil, fmt.Errorf("[ERROR] failed to connect: %w", err)
+	}
+
+	defer func() {
+		_ = res.Body.Close()
+	}()
 
 	if res.StatusCode != http.StatusOK {
-		return "", nil, fmt.Errorf("[ERROR] server returned status: %d", res.StatusCode)
-
+		bodySnippet, _ := io.ReadAll(io.LimitReader(res.Body, 512))
+		return "", nil, fmt.Errorf("[ERROR] server returned status: %d, body: %s", res.StatusCode, string(bodySnippet))
 	}
+
 	body, err := io.ReadAll(res.Body)
+
 	if err != nil {
 		return "", nil, fmt.Errorf("[ERROR] failed to read response: %w", err)
 	}
@@ -105,29 +141,44 @@ func (r *SKIPRepository) skipRequest(requestUrl string) (string, []byte, error) 
 	})
 
 	if decodeErr != nil {
-		return "", nil, fmt.Errorf("[ERROR] failed to decode hex key: %w", decodeErr)
+		return "", nil, fmt.Errorf("[ERROR] failed to decode hex key: %v", decodeErr)
+	}
+
+	if len(rawKey) != 32 {
+		return "", nil, fmt.Errorf("[ERROR] invalid key length: got %d bytes, expected 32", len(rawKey))
 	}
 
 	return skipResp.KeyID, rawKey, nil
 }
 
 func (r *SKIPRepository) GetNewKey() (string, []byte, error) {
-	requestUrl := r.baseURL + "/key?remoteSystemID=" + r.remoteSystemId
-	KeyID, key, err := r.skipRequest(requestUrl)
+	requestURL := r.baseURL + "/key?remoteSystemID=" + r.remoteSystemID
+	keyID, key, err := r.skipRequest(requestURL)
 
 	if err != nil {
 		return "", nil, fmt.Errorf("[ERROR] failed to get new key: %w", err)
 	}
 
-	return KeyID, key, nil
+	return keyID, key, nil
 }
 
 func (r *SKIPRepository) GetKeyByID(keyID *string) ([]byte, error) {
 	if keyID == nil || *keyID == "" {
 		return nil, fmt.Errorf("[ERROR] keyID is nil or empty")
 	}
-	requestUrl := r.baseURL + "/key/" + *keyID + "?remoteSystemID=" + r.remoteSystemId
-	_, key, err := r.skipRequest(requestUrl)
+
+	if len(*keyID) > 128 {
+		return nil, fmt.Errorf("[ERROR] keyID is too long")
+	}
+
+	if _, err := hex.DecodeString(*keyID); err != nil {
+		return nil, fmt.Errorf("[ERROR] keyID is not a valid hex string")
+	}
+
+	escapedKeyID := url.PathEscape(*keyID)
+
+	requestURL := r.baseURL + "/key/" + escapedKeyID + "?remoteSystemID=" + r.remoteSystemID
+	_, key, err := r.skipRequest(requestURL)
 
 	if err != nil {
 		return nil, fmt.Errorf("[ERROR] failed to get this key: %w", err)
